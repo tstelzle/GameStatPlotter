@@ -1,16 +1,21 @@
 import pandas as pd
 import glob
 import matplotlib.pyplot as plt
+import os
 
 list_day = []
 
-def read_data():
+def read_all_data():
     path = 'data/formatted'
     all_files = glob.glob(path + '/*.csv')
 
     for filename in all_files:
         df = pd.read_csv(filename, index_col=None, header=0)
         list_day.append(df)
+
+def read_single_data(filename):
+    df = pd.read_csv(filename, index_col=None, header=0)
+    return df
 
 def get_player_columns(chosen_dataframe: pd.DataFrame):
     return [player_columns for player_columns in chosen_dataframe.columns if 'Spieler' in player_columns]
@@ -39,15 +44,33 @@ def get_max(chosen_dataframe: pd.DataFrame):
 
     return maximum
 
+def create_plot_for_day(day: str):
+    file = 'data/formatted/' + day + '.csv'
+    df = read_single_data(file)
+    min_y = get_min(df)
+    max_y = get_max(df)
+    min_x = df['Spielnummer'].min()
+    max_x = df['Spielnummer'].max()
+
+    plt.axis([min_x, max_x, min_y, max_y])
+    plt.xlabel('Spiel')
+    plt.ylabel('Punkte')
+    plt.title('Skat Spiel am ' + day)
+    for player in get_player_columns(df):
+        player_name = player.split(' - ')[1]
+        plt.plot(df['Spielnummer'], df[player], label=player_name)
+    plt.legend()
+    plt.savefig('data/diagramms/' + day, dpi=72)
+    plt.show()
+
+def create_diagramm_folder():
+    directory_created = os.path.isdir('data/diagramms')
+    if not directory_created:
+        os.mkdir('data/diagramms')
+
 def main():
-    read_data()
-    #print(list_day)
-    #print(len(list_day))
-
-    print(list_day[0])
-
-    print(get_min(list_day[0]))
-    print(get_max(list_day[0]))
+    create_diagramm_folder()
+    create_plot_for_day('04-12-2020')
 
 if __name__ == '__main__':
    main()
