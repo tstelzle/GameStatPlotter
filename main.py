@@ -7,6 +7,7 @@ import format_data as formatter
 
 list_day = []
 
+
 def read_all_data():
     path = 'data/formatted'
     all_files = glob.glob(path + '/*.csv')
@@ -15,12 +16,15 @@ def read_all_data():
         df = pd.read_csv(filename, index_col=None, header=0)
         list_day.append(df)
 
+
 def read_single_data(filename):
     df = pd.read_csv(filename, index_col=None, header=0)
     return df
 
+
 def get_player_columns(chosen_dataframe: pd.DataFrame):
     return [player_columns for player_columns in chosen_dataframe.columns if 'Spieler' in player_columns]
+
 
 def get_min(chosen_dataframe: pd.DataFrame):
     player_columns = get_player_columns(chosen_dataframe)
@@ -34,6 +38,7 @@ def get_min(chosen_dataframe: pd.DataFrame):
 
     return minimum
 
+
 def get_max(chosen_dataframe: pd.DataFrame):
     player_columns = get_player_columns(chosen_dataframe)
 
@@ -46,8 +51,9 @@ def get_max(chosen_dataframe: pd.DataFrame):
 
     return maximum
 
+
 def create_plot_for_day(day: str):
-    formatter.format(day)
+    formatter.format_file(day)
     file = 'data/formatted/' + day + '.csv'
     df = read_single_data(file)
     min_y = get_min(df)
@@ -66,15 +72,17 @@ def create_plot_for_day(day: str):
     plt.savefig('data/diagramms/' + day, dpi=72)
     plt.show()
 
+
 def create_diagramm_folder():
     directory_created = os.path.isdir('data/diagramms')
     if not directory_created:
         os.mkdir('data/diagramms')
 
+
 def main():
     create_diagramm_folder()
     create_plot_for_day('04-12-2020')
 
-if __name__ == '__main__':
-   main()
 
+if __name__ == '__main__':
+    main()

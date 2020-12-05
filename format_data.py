@@ -4,6 +4,7 @@ import os
 data_dict = {}
 headers = []
 
+
 def read_to_dict(file: str):
     global headers
     with open(file) as data:
@@ -15,16 +16,19 @@ def read_to_dict(file: str):
             data_dict[line_count] = record
             line_count += 1
 
+
 def replace_hyphen_all_columns():
     player_columns = [players for players in headers if 'Spieler' in players]
     for column in player_columns:
         replace_hyphen(column)
 
+
 def replace_hyphen(column: str):
-    for key,data in data_dict.items():
+    for key, data in data_dict.items():
         if data[column] == '-':
-            previous_entry = get_previous_entry(key-1, column)
+            previous_entry = get_previous_entry(key - 1, column)
             data[column] = previous_entry
+
 
 def get_previous_entry(key: int, column: str):
     if key == -1:
@@ -39,7 +43,8 @@ def get_previous_entry(key: int, column: str):
         if entry != '-':
             return entry
         else:
-            return get_previous_entry(key-1, column)
+            return get_previous_entry(key - 1, column)
+
 
 def write_to_csv(file: str):
     directory_created = os.path.isdir('data/formatted')
@@ -53,10 +58,12 @@ def write_to_csv(file: str):
         for i in range(0, len(data_dict.items())):
             writer.writerow(data_dict[i])
 
+
 def get_filename(file: str):
     return file.split('/')[2]
 
-def format(day: str):
+
+def format_file(day: str):
     file = 'data/raw/' + day + '.csv'
     read_to_dict(file)
     replace_hyphen_all_columns()
