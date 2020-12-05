@@ -56,11 +56,8 @@ def write_to_csv(file: str):
 def get_filename(file: str):
     return file.split('/')[2]
 
-def main():
-    file = 'data/raw/04-12-2020.csv'
+def format(day: str):
+    file = 'data/raw/' + day + '.csv'
     read_to_dict(file)
     replace_hyphen_all_columns()
     write_to_csv(file)
-
-if __name__ == "__main__":
-    main()

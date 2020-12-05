@@ -3,6 +3,8 @@ import glob
 import matplotlib.pyplot as plt
 import os
 
+import format_data as formatter
+
 list_day = []
 
 def read_all_data():
@@ -45,6 +47,7 @@ def get_max(chosen_dataframe: pd.DataFrame):
     return maximum
 
 def create_plot_for_day(day: str):
+    formatter.format(day)
     file = 'data/formatted/' + day + '.csv'
     df = read_single_data(file)
     min_y = get_min(df)

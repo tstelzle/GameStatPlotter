@@ -1,3 +1,4 @@
 /**/*.csv
 .idea/
 /**/*.png
+__pycache__/
