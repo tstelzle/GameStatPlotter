@@ -2,6 +2,7 @@ import pandas as pd
 import glob
 import matplotlib.pyplot as plt
 import os
+import sys
 
 import format_data as formatter
 
@@ -80,8 +81,14 @@ def create_diagramm_folder():
 
 
 def main():
+    if len(sys.argv) != 2:
+        print('Specify .csv file to read data from.')
+        return
+    else:
+        filename = sys.argv[1]
+
     create_diagramm_folder()
-    create_plot_for_day('04-12-2020')
+    create_plot_for_day(filename)
 
 
 if __name__ == '__main__':
