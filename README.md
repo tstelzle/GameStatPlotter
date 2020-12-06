@@ -17,6 +17,7 @@ In this file you can also see, how the csv file has to be setup.
 You run the programm with the command 
 
 ```bash
+pip install -r requirements.txt
 python3 main.py
 ```
 
@@ -24,6 +25,27 @@ You can add the following parameters:
 * "-g=\<game\>", where game is the directory of the name you want to plot
 * "-c", Counts the non zero entries
 * "-d=\<date\>", with specifing the name (here the date) of the csv you can only plot a single file
+
+Otherwise you can use the docker-container with the commands from the Makefile.
+
+````bash
+make build-image
+make container
+make run
+````
+
+When using the Makefile the parameters are set with the Makefile Variables "GAME" (-g) and "DAY" (-d).
+The counter can be activated with running:
+
+```bash
+make run-counter
+```
+
+instead of
+
+```bash
+make run
+```
 
 ### Differences between plotting all and one file
 Plotting all files usually takes the last entry in the list.
