@@ -8,14 +8,20 @@ from datetime import datetime
 import format_data as formatter
 
 
-def read_all_data():
-    path = 'data/formatted'
+def read_all_data(game: str):
+    path_raw = 'data/' + game + '/raw'
+    all_raw_files = glob.glob(path_raw + '/*.csv')
+    for filename in all_raw_files:
+        day = filename.split('/')[-1].split('.')[0]
+        formatter.format_file(game, day)
+
+    path = 'data/' + game + '/formatted'
     all_files = glob.glob(path + '/*.csv')
     all_data = []
 
     for filename in all_files:
         df = pd.read_csv(filename, index_col=None, header=0)
-        my_dict = {filename.split('/')[2].split('.')[0]: df}
+        my_dict = {filename.split('/')[3].split('.')[0]: df}
         all_data.append(my_dict)
 
     return all_data
@@ -56,8 +62,8 @@ def get_max(chosen_dataframe: pd.DataFrame):
     return maximum
 
 
-def create_plot_for_all_days():
-    data = read_all_data()
+def create_plot_for_all_days(game: str):
+    data = read_all_data(game)
     days = []
 
     plt.xlabel('Spieltag')
@@ -70,19 +76,22 @@ def create_plot_for_all_days():
 
             for player in get_player_columns(value):
                 player_name = player.split(' - ')[1]
-                player_result = value[player].iloc[-1]
+                if counter:
+                    player_result = value[player].astype(bool).sum(axis=0)
+                else:
+                    player_result = value[player].iloc[-1]
                 plt.scatter(key, player_result, label=player_name)
 
     days.sort(key=lambda date: datetime.strptime(date, '%d-%m-%Y'))
     plt.xticks(days)
     plt.legend()
-    plt.savefig('data/diagramms/' + 'all_data', dpi=300)
+    plt.savefig('data/' + game + '/diagramms/' + 'all_data', dpi=300)
     plt.show()
 
 
-def create_plot_for_day(day: str):
-    formatter.format_file(day)
-    file = 'data/formatted/' + day + '.csv'
+def create_plot_for_day(game: str, day: str):
+    formatter.format_file(game, day)
+    file = 'data/' + game + '/formatted/' + day + '.csv'
     df = read_single_data(file)
     min_y = get_min(df)
     max_y = get_max(df)
@@ -95,29 +104,48 @@ def create_plot_for_day(day: str):
     plt.title('Skat Spiel am ' + day)
     for player in get_player_columns(df):
         player_name = player.split(' - ')[1]
-        plt.plot(df['Spielnummer'], df[player], label=player_name)
+        if counter:
+            player_result = df[player].astype(bool)
+        else:
+            player_result = df[player]
+        plt.plot(df['Spielnummer'], player_result, label=player_name)
     plt.legend()
-    plt.savefig('data/diagramms/' + day, dpi=72)
+    plt.savefig('data/' + game + '/diagramms/' + day, dpi=72)
     plt.show()
 
 
-def create_diagramm_folder():
-    directory_created = os.path.isdir('data/diagramms')
+def create_diagramm_folder(game: str):
+    directory_created = os.path.isdir('data/' + game + '/diagramms')
     if not directory_created:
-        os.mkdir('data/diagramms')
+        os.mkdir('data/' + game + '/diagramms')
 
 
 def main():
-    create_diagramm_folder()
+    global counter
+
+    game = ''
+    counter = False
+    date = ''
 
     if len(sys.argv) == 1:
-        create_plot_for_all_days()
-    elif len(sys.argv) == 2:
-        filename = sys.argv[1]
-        create_plot_for_day(filename)
-    else:
-        print('Too many options.')
+        print('Specifiy parameters.')
         return
+
+    for i in range(1, len(sys.argv)):
+        parameter = sys.argv[i]
+        if '-g' in parameter:
+            game = parameter.split('=')[1]
+        elif '-c' in parameter:
+            counter = True
+        elif '-d' in parameter:
+            date = parameter.split('=')[1]
+
+    create_diagramm_folder(game)
+
+    if not date:
+        create_plot_for_all_days(game)
+    else:
+        create_plot_for_day(game, date)
 
 
 if __name__ == '__main__':

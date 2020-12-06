@@ -47,11 +47,13 @@ def get_previous_entry(key: int, column: str):
 
 
 def write_to_csv(file: str):
-    directory_created = os.path.isdir('data/formatted')
+    directory_list = file.split('/')
+    directory = directory_list[0] + '/' + directory_list[1] + '/formatted'
+    directory_created = os.path.isdir(directory)
     if not directory_created:
-        os.mkdir('data/formatted')
+        os.mkdir(directory)
 
-    with open('data/formatted/' + get_filename(file), 'w+') as csvfile:
+    with open(directory + '/' + get_filename(file), 'w+') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=headers)
 
         writer.writeheader()
@@ -60,11 +62,11 @@ def write_to_csv(file: str):
 
 
 def get_filename(file: str):
-    return file.split('/')[2]
+    return file.split('/')[3]
 
 
-def format_file(day: str):
-    file = 'data/raw/' + day + '.csv'
+def format_file(game: str, day: str):
+    file = 'data/' + game + '/raw/' + day + '.csv'
     read_to_dict(file)
     replace_hyphen_all_columns()
     write_to_csv(file)
