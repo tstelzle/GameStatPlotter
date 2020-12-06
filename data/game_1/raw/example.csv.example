@@ -1,2 +1,2 @@
-Sieler 1 - <name>, ...,Spieler n - <name>,Spielnummer,Spieltyp
+Spieler 1 - <name>, ...,Spieler n - <name>,Spielnummer,Spieltyp
 int or '-', ..., int or '-', int, string
