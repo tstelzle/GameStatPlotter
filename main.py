@@ -89,8 +89,9 @@ def create_plot_for_all_days(game: str):
         values_sorted = dict(sorted(values.items(), key=lambda date: datetime.strptime(date[0], '%d-%m-%Y')))
         plt.plot(values_sorted.keys(), values_sorted.values(), 'o-', label=player)
 
-    plt.xticks(days)
+    plt.xticks(days, rotation=45)
     plt.legend()
+    plt.tight_layout()
     plt.savefig('data/' + game + '/diagramms/' + 'all_data', dpi=300)
     plt.show()
 
@@ -116,7 +117,7 @@ def create_plot_for_day(game: str, day: str):
             player_result = df[player]
         plt.plot(df['Spielnummer'], player_result, 'o-', label=player_name)
     plt.legend()
-    plt.savefig('data/' + game + '/diagramms/' + day, dpi=100)
+    plt.savefig('data/' + game + '/diagramms/' + day, dpi=300)
     plt.show()
 
 
