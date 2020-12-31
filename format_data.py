@@ -1,12 +1,13 @@
 import csv
 import os
 
-data_dict = {}
 headers = []
 
 
 def read_to_dict(file: str):
     global headers
+    data_dict = {}
+    headers = []
     with open(file) as data:
         csv_reader = csv.reader(data, delimiter=',')
         headers = next(csv_reader)
@@ -16,21 +17,27 @@ def read_to_dict(file: str):
             data_dict[line_count] = record
             line_count += 1
 
+    return data_dict
 
-def replace_hyphen_all_columns():
+
+def replace_hyphen_all_columns(data: dict):
     player_columns = [players for players in headers if 'Spieler' in players]
     for column in player_columns:
-        replace_hyphen(column)
+        data = replace_hyphen(data, column)
+
+    return data
 
 
-def replace_hyphen(column: str):
+def replace_hyphen(data_dict: dict, column: str):
     for key, data in data_dict.items():
         if data[column] == '-':
-            previous_entry = get_previous_entry(key - 1, column)
+            previous_entry = get_previous_entry(data_dict, key - 1, column)
             data[column] = previous_entry
 
+    return data_dict
 
-def get_previous_entry(key: int, column: str):
+
+def get_previous_entry(data_dict: dict, key: int, column: str):
     if key == -1:
         key = 0
     entry = data_dict[key][column]
@@ -43,10 +50,10 @@ def get_previous_entry(key: int, column: str):
         if entry != '-':
             return entry
         else:
-            return get_previous_entry(key - 1, column)
+            return get_previous_entry(data_dict, key - 1, column)
 
 
-def write_to_csv(file: str):
+def write_to_csv(data_dict: dict, file: str):
     directory_list = file.split('/')
     directory = directory_list[0] + '/' + directory_list[1] + '/formatted'
     directory_created = os.path.isdir(directory)
@@ -67,6 +74,6 @@ def get_filename(file: str):
 
 def format_file(game: str, day: str):
     file = 'data/' + game + '/raw/' + day + '.csv'
-    read_to_dict(file)
-    replace_hyphen_all_columns()
-    write_to_csv(file)
+    data = read_to_dict(file)
+    data = replace_hyphen_all_columns(data)
+    write_to_csv(data, file)

@@ -66,23 +66,29 @@ def create_plot_for_all_days(game: str):
     data = read_all_data(game)
     days = []
 
-    plt.xlabel('Spieltag')
-    plt.ylabel('Punkte')
-    plt.title('Skatspiele')
-
-    for elem in data:
-        for key, value in elem.items():
+    players = {}
+    for day in data:
+        for key, value in day.items():
             days.append(key)
-
             for player in get_player_columns(value):
                 player_name = player.split(' - ')[1]
                 if counter:
                     player_result = value[player].astype(bool).sum(axis=0)
                 else:
                     player_result = value[player].iloc[-1]
-                plt.scatter(key, player_result, label=player_name)
+                if player_name in players.keys():
+                    players[player_name][key] = player_result
+                else:
+                    players[player_name] = {key: player_result}
 
-    days.sort(key=lambda date: datetime.strptime(date, '%d-%m-%Y'))
+    plt.xlabel('Spieltag')
+    plt.ylabel('Punkte')
+    plt.title(game + 'spiele')
+
+    for player, values in players.items():
+        values_sorted = dict(sorted(values.items(), key=lambda date: datetime.strptime(date[0], '%d-%m-%Y')))
+        plt.plot(values_sorted.keys(), values_sorted.values(), 'o-', label=player)
+
     plt.xticks(days)
     plt.legend()
     plt.savefig('data/' + game + '/diagramms/' + 'all_data', dpi=300)
@@ -101,16 +107,16 @@ def create_plot_for_day(game: str, day: str):
     plt.axis([min_x, max_x, min_y, max_y])
     plt.xlabel('Spiel')
     plt.ylabel('Punkte')
-    plt.title('Skat Spiel am ' + day)
+    plt.title(game + ' Spiel am ' + day)
     for player in get_player_columns(df):
         player_name = player.split(' - ')[1]
         if counter:
             player_result = df[player].astype(bool)
         else:
             player_result = df[player]
-        plt.plot(df['Spielnummer'], player_result, label=player_name)
+        plt.plot(df['Spielnummer'], player_result, 'o-', label=player_name)
     plt.legend()
-    plt.savefig('data/' + game + '/diagramms/' + day, dpi=72)
+    plt.savefig('data/' + game + '/diagramms/' + day, dpi=100)
     plt.show()
 
 
